@@ -2,12 +2,12 @@
 import Image from "next/image"
 import {useState, useEffect} from 'react'
 import {firestore} from '@/firebase'
-import {Box, Modal, Typography, Stack, TextField} from '@mui/material'
+import {Box, Modal, Typography, Stack, TextField, Button} from '@mui/material'
 import {collection, getDocs , query} from 'firebase/firestore'
 
 export default function Home() {
  const [inventory, setInventory] = useState([])
- const [open, setOpen] = useState(true)
+ const [open, setOpen] = useState(false)
  const [itemName, setItemName] = useState([''])
 
 const updateInventory = async () =>{
@@ -83,7 +83,7 @@ return(
     flexDirection="column"
     gap={3}
     sx={{
-      tranform: 'translate(-50%, -50%)',
+      transform: 'translate(-50%, -50%)',
     }}
     >
       <Typography variant="h6">Add Item</Typography>
@@ -96,7 +96,16 @@ return(
             setItemName(e.target.value)
           }}
           />
-          
+          <Button
+          variant="outlined"
+          onClick={ ()=>{
+            addItem(itemName)
+            setItemName('')
+            handleClose()
+          }}
+          >
+            Add
+          </Button>
       </Stack>
     </Box>
    </Modal>
