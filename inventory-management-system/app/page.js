@@ -1,22 +1,20 @@
 'use client'
 import Image from "next/image"
-import {useState, useEffect} from 'react'
-import {firestore} from '@/firebase'
-import {Box, Modal, Typography, Stack, TextField, Button, AppBar, Toolbar, Snackbar, Alert} from '@mui/material'
+import { useState, useEffect } from 'react'
+import { firestore } from '@/firebase'
+import { Box, Modal, Typography, Stack, TextField, Button, AppBar, Toolbar, Snackbar, Alert, Grid } from '@mui/material'
 import {
-  collection, 
-  getDocs , 
+  collection,
+  getDocs,
   query,
   deleteDoc,
   doc,
   getDoc,
   setDoc,
 } from 'firebase/firestore'
-
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
 import Grow from '@mui/material/Grow'
-
 
 export default function Home() {
   const [inventory, setInventory] = useState([])
@@ -28,32 +26,32 @@ export default function Home() {
   const [snackbarMessage, setSnackbarMessage] = useState('')
   const [snackbarSeverity, setSnackbarSeverity] = useState('success') // 'success' | 'error' | 'info' | 'warning'
 
-  const updateInventory = async () =>{
+  const updateInventory = async () => {
     const snapshot = query(collection(firestore, 'inventory'))
     const docs = await getDocs(snapshot)
     const inventoryList = []
-    docs.forEach((doc)=>{
+    docs.forEach((doc) => {
       inventoryList.push({
         name: doc.id,
-        ...doc.data()    
+        ...doc.data()
       })
     })
 
     setInventory(inventoryList)
   }
 
-  const addItem = async (item) =>{
+  const addItem = async (item) => {
     const standardizedItem = item.toLowerCase()
     const docRef = doc(collection(firestore, 'inventory'), standardizedItem)
     const docSnap = await getDoc(docRef)
 
-    if(docSnap.exists()){
-      const {quantity} = docSnap.data()
-      await setDoc(docRef, {quantity: quantity + 1})
+    if (docSnap.exists()) {
+      const { quantity } = docSnap.data()
+      await setDoc(docRef, { quantity: quantity + 1 })
       setSnackbarMessage(`Increased quantity of ${standardizedItem}`)
       setSnackbarSeverity('success')
-    } else{
-      await setDoc(docRef, {quantity: 1})
+    } else {
+      await setDoc(docRef, { quantity: 1 })
       setSnackbarMessage(`Added new item: ${standardizedItem}`)
       setSnackbarSeverity('success')
     }
@@ -62,18 +60,18 @@ export default function Home() {
     await updateInventory()
   }
 
-  const removeItem = async (item) =>{
+  const removeItem = async (item) => {
     const docRef = doc(collection(firestore, 'inventory'), item)
     const docSnap = await getDoc(docRef)
 
-    if(docSnap.exists()){
-      const {quantity} = docSnap.data()
-      if (quantity === 1){
+    if (docSnap.exists()) {
+      const { quantity } = docSnap.data()
+      if (quantity === 1) {
         await deleteDoc(docRef)
         setSnackbarMessage(`Removed item: ${item}`)
         setSnackbarSeverity('info')
-      } else{
-        await setDoc(docRef, {quantity: quantity-1})
+      } else {
+        await setDoc(docRef, { quantity: quantity - 1 })
         setSnackbarMessage(`Decreased quantity of ${item}`)
         setSnackbarSeverity('warning')
       }
@@ -86,7 +84,7 @@ export default function Home() {
     await updateInventory()
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     updateInventory()
   }, [])
 
@@ -100,8 +98,7 @@ export default function Home() {
     setSnackbarOpen(false)
   }
 
-  return(
-
+  return (
     <Box>
       {/* Navbar */}
       <AppBar position="static">
@@ -112,7 +109,7 @@ export default function Home() {
           <Button color="inherit">Login</Button>
         </Toolbar>
       </AppBar>
-    
+
       <Box
         width="100vw"
         height="100vh"
@@ -120,8 +117,8 @@ export default function Home() {
         flexDirection="column"
         justifyContent="center"
         alignItems="center"
-        gap={4} //increased gap for more breathing room
-        padding={4} //arounf box
+        gap={4} // increased gap for more breathing room
+        padding={4} // around box
         bgcolor="#f5f5f5"
         sx={{
           backgroundImage: 'url(http://www.pixelstalk.net/wp-content/uploads/2016/08/Wonderful-Nature-Colorful-Scene-HD.jpg)',
@@ -153,13 +150,13 @@ export default function Home() {
                 variant="outlined"
                 fullWidth
                 value={itemName}
-                onChange={(e) =>{
+                onChange={(e) => {
                   setItemName(e.target.value)
                 }}
               />
               <Button
                 variant="outlined"
-                onClick={ ()=>{
+                onClick={() => {
                   addItem(itemName)
                   setItemName('')
                   handleClose()
@@ -173,80 +170,92 @@ export default function Home() {
 
         <Button
           variant="contained"
-          onClick={()=>{
+          onClick={() => {
             handleOpen()
           }}
         >
           Add New Item
         </Button>
-        <Box border="1px solid #333">
-          <Box bgcolor="#e0f7fa"
-            width="800px" 
-            height="100px" 
-          // bgcolor="#ADD8E6" 
+
+        <Box
+          border="1px solid #333"
+          bgcolor="#ffffff"
+          padding={3}
+          borderRadius={4}
+          boxShadow="0px 3px 15px rgba(0, 0, 0, 0.2)"
+          width="100%"
+          maxWidth="1200px"
+        >
+          <Box
+            bgcolor="#e0f7fa"
+            width="100%"
+            height="100px"
             display="flex"
             alignItems="center"
             justifyContent="center"
+            borderRadius={2}
+            mb={2} // margin-bottom for spacing
           >
             <Typography variant="h3" color="#333" fontWeight="bold">
               Inventory Items
             </Typography>
           </Box>
 
-          <Stack width="800px" height="300px" spacing={2} overflow="auto">
-            {inventory.map(({name, quantity}) => (
-              <Grow in={true} timeout={500} key={name}>
-                <Box
-                  key={name}
-                  width="100%"
-                  minHeight="150px"
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="space-between"
-                  bgcolor="#f0f0f0"
-                  padding={3}
-                  sx={{
-                    transition: 'background-color 0.3s',
-                    '&:hover': {
-                      backgroundColor: '#e0e0e0',
-                    },
-                  }}
-                >
-              
-                  <Typography variant="h3" color="#333" textAlign="center">
-                    {name.charAt(0).toUpperCase() + name.slice(1)}
-                  </Typography>
+          <Grid container spacing={2}>
+            {inventory.map(({ name, quantity }) => (
+              <Grid item xs={12} sm={6} md={4} key={name}>
+                <Grow in={true} timeout={500}>
+                  <Box
+                    width="100%"
+                    minHeight="200px"
+                    display="flex"
+                    flexDirection="column"
+                    alignItems="center"
+                    bgcolor="#f0f0f0"
+                    padding={2}
+                    borderRadius={4}
+                    boxShadow="0px 2px 10px rgba(0, 0, 0, 0.1)"
+                    sx={{
+                      transition: 'background-color 0.3s',
+                      '&:hover': {
+                        backgroundColor: '#e0e0e0',
+                      },
+                    }}
+                  >
+                    <Typography variant="h5" color="#333" textAlign="center">
+                      {name.charAt(0).toUpperCase() + name.slice(1)}
+                    </Typography>
+                    <Typography variant="h6" color="#333" textAlign="center" mt={1}>
+                      Quantity: {quantity}
+                    </Typography>
 
-                  <Typography variant="h3" color="#333" textAlign="center">
-                    {quantity}
-                  </Typography>
+                    <Stack direction="row" spacing={2} mt={2}>
+                      <Button
+                        variant="contained"
+                        startIcon={<AddIcon />}
+                        onClick={() => {
+                          addItem(name)
+                        }}
+                      >
+                        Add
+                      </Button>
 
-                  <Stack direction="row" spacing={2}>
-                    <Button
-                      variant="contained"
-                      startIcon={<AddIcon />}
-                      onClick={()=>{
-                        addItem(name)
-                      }}
-                    >
-                      Add
-                    </Button>
-
-                    <Button
-                      variant="contained"
-                      color="error" // Different color for Remove
-                      startIcon={<RemoveIcon />}
-                      onClick={()=>{
-                        removeItem(name)
-                      }}
-                    >
-                      Remove
-                    </Button>
-                  </Stack>
-                </Box>
-              </Grow>
+                      <Button
+                        variant="contained"
+                        color="error"
+                        startIcon={<RemoveIcon />}
+                        onClick={() => {
+                          removeItem(name)
+                        }}
+                      >
+                        Remove
+                      </Button>
+                    </Stack>
+                  </Box>
+                </Grow>
+              </Grid>
             ))}
-          </Stack>
+          </Grid>
         </Box>
       </Box>
 
@@ -261,7 +270,6 @@ export default function Home() {
           {snackbarMessage}
         </Alert>
       </Snackbar>
-
     </Box>
   )
 }
