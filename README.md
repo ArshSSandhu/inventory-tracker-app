@@ -13,13 +13,7 @@ Welcome to the **Inventory Management System**! This project is a modern, user-f
 
 ## 🔧 Technologies Used
 
-- **JavaScript**: The core language for functionality and logic.
-- **React**: JavaScript library for building dynamic user interfaces.
-- **Next.js**: React framework for server-side rendering and static site generation.
-- **Material-UI**: Component library for styling and pre-built UI components.
-- **Firebase**: Backend platform for authentication, data storage, and real-time database.
-- **Firestore**: NoSQL database for storing and managing inventory data.
-- **HTML/CSS**: Basic markup and styling for additional customization.
+<img src="https://skillicons.dev/icons?i=js,react,nextjs,materialui,firebase,html,css" />
 
 ## 📸 Screenshots
 
