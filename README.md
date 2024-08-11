@@ -1,7 +1,5 @@
 # Inventory Management System
 
-## 📜 Description
-
 Welcome to the **Inventory Management System**! This project is a modern, user-friendly web application designed to help you manage your inventory with ease. Built using the latest technologies, it offers a clean interface and efficient management of items, allowing you to add, update, and remove inventory items seamlessly. Whether you’re managing a small business or simply keeping track of personal items, this tool provides a comprehensive solution with a sleek, intuitive design.
 
 ## 🚀 Features
