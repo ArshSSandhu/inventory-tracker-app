@@ -23,7 +23,6 @@ Welcome to the **Inventory Management System**! This project is a modern, user-f
 
 ## 📸 Screenshots
 
-![Inventory Management System](assets/1.png)  
-![Inventory Management System](assets/2.png) 
-![Inventory Management System](assets/3.png) 
-
+![Inventory Management System](inventory-management-system/readme_images/1.png)  
+![Inventory Management System](inventory-management-system/readme_images/2.png)  
+![Inventory Management System](inventory-management-system/readme_images/3.png)  
