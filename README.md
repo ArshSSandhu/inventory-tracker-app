@@ -1,5 +1,5 @@
 # Inventory Management System
-
+![License](https://img.shields.io/badge/license-MIT-green) <br>
 Welcome to the **Inventory Management System**! This project is a modern, user-friendly web application designed to help you manage your inventory with ease. Built using the latest technologies, it offers a clean interface and efficient management of items, allowing you to add, update, and remove inventory items seamlessly. Whether you’re managing a small business or simply keeping track of personal items, this tool provides a comprehensive solution with a sleek, intuitive design.
 
 ## 🚀 Features
@@ -20,3 +20,5 @@ Welcome to the **Inventory Management System**! This project is a modern, user-f
 ![Inventory Management System](inventory-management-system/readme_images/1.png)  
 ![Inventory Management System](inventory-management-system/readme_images/2.png)  
 ![Inventory Management System](inventory-management-system/readme_images/3.png)  
+
+
