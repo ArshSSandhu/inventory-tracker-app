@@ -105,12 +105,11 @@ export default function Home() {
   return (
     <Box>
       {/* Navbar */}
-      <AppBar position="static">
+      <AppBar position="static" sx={{ bgcolor: 'black' }} >
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Inventory Management
+            Inventory Management System
           </Typography>
-          <Button color="inherit">Login</Button>
         </Toolbar>
       </AppBar>
 
@@ -125,7 +124,7 @@ export default function Home() {
         padding={4}
         bgcolor="#f5f5f5"
         sx={{
-          backgroundImage: 'url(http://www.pixelstalk.net/wp-content/uploads/2016/08/Wonderful-Nature-Colorful-Scene-HD.jpg)',
+          backgroundImage: 'url()',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
@@ -224,7 +223,7 @@ export default function Home() {
   flexDirection="column" // Ensure it stacks items vertically
 >
   <Box
-    bgcolor="#e0f7fa"
+    bgcolor=""
     width="100%"
     height="100px"
     display="flex"
@@ -233,7 +232,7 @@ export default function Home() {
     borderRadius={2}
     mb={2} // margin-bottom for spacing
   >
-    <Typography variant="h3" color="#333" fontWeight="bold">
+    <Typography variant="h5" color="#333" fontWeight="bold">
       Inventory Items
     </Typography>
   </Box>
