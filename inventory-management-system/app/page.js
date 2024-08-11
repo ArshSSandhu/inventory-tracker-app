@@ -13,6 +13,9 @@ import {
   setDoc,
 } from 'firebase/firestore'
 
+import AddIcon from '@mui/icons-material/Add'
+import RemoveIcon from '@mui/icons-material/Remove'
+
 export default function Home() {
  const [inventory, setInventory] = useState([])
  const [open, setOpen] = useState(false)
@@ -78,7 +81,9 @@ return(
     flexDirection="column"
     justifyContent="center"
     alignItems="center"
-    gap={2}
+    gap={4} //increased gap for more breathing room
+    padding={4} //arounf box
+    bgcolor="#f5f5f5"
   >
     <Modal open={open} onClose={handleClose}>
       <Box
@@ -97,8 +102,8 @@ return(
           transform: 'translate(-50%, -50%)',
         }}
       >
-        <Typography variant="h6">Add Item</Typography>
-        <Stack width="100%" direction="row" spacing={2}>
+        <Typography variant="h6" textAlign="center" >Add Item</Typography>
+        <Stack width="100%" direction="row" spacing={3}>
           <TextField
             variant="outlined"
             fullWidth
@@ -138,23 +143,29 @@ return(
         alignItems="center"
         justifyContent="center"
       >
-        <Typography variant="h2" color="#333">
+        <Typography variant="h3" color="#333" fontWeight="bold">
           Inventory Items
         </Typography>
       </Box>
 
       <Stack width="800px" height="300px" spacing={2} overflow="auto">
-        {inventory.map(({name, quantity}) => (
-          <Box
-            key={name}
-            width="100%"
-            minHeight="150px"
-            display="flex"
-            alignItems="center"
-            justifyContent="space-between"
-            bgcolor="#f0f0f0"
-            padding={5}
-          >
+  {inventory.map(({name, quantity}) => (
+    <Box
+      key={name}
+      width="100%"
+      minHeight="150px"
+      display="flex"
+      alignItems="center"
+      justifyContent="space-between"
+      bgcolor="#f0f0f0"
+      padding={3}
+      sx={{
+        transition: 'background-color 0.3s',
+        '&:hover': {
+          backgroundColor: '#e0e0e0',
+        },
+      }}
+    >
             <Typography variant="h3" color="#333" textAlign="center">
               {name.charAt(0).toUpperCase() + name.slice(1)}
             </Typography>
@@ -166,6 +177,7 @@ return(
             <Stack direction="row" spacing={2}>
               <Button
                 variant="contained"
+                startIcon={<AddIcon />}
                 onClick={()=>{
                   addItem(name)
                 }}
@@ -175,6 +187,8 @@ return(
 
               <Button
                 variant="contained"
+                color="error" // Different color for Remove
+                startIcon={<RemoveIcon />}
                 onClick={()=>{
                   removeItem(name)
                 }}
