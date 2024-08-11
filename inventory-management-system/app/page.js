@@ -20,12 +20,13 @@ export default function Home() {
   const [inventory, setInventory] = useState([])
   const [open, setOpen] = useState(false)
   const [itemName, setItemName] = useState('')
-  const [itemQuantity, setItemQuantity] = useState(1) // New state for quantity
+  const [itemQuantity, setItemQuantity] = useState(1)
+  const [itemPrice, setItemPrice] = useState('') // New state for price
   
   // Snackbar state
   const [snackbarOpen, setSnackbarOpen] = useState(false)
   const [snackbarMessage, setSnackbarMessage] = useState('')
-  const [snackbarSeverity, setSnackbarSeverity] = useState('success') // 'success' | 'error' | 'info' | 'warning'
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success')
 
   const updateInventory = async () => {
     const snapshot = query(collection(firestore, 'inventory'))
@@ -41,19 +42,21 @@ export default function Home() {
     setInventory(inventoryList)
   }
 
-  const addItem = async (item, quantity) => {
+  const addItem = async (item, quantity, price) => {
     const standardizedItem = item.toLowerCase()
     const docRef = doc(collection(firestore, 'inventory'), standardizedItem)
     const docSnap = await getDoc(docRef)
 
+    const totalPrice = price * quantity;
+
     if (docSnap.exists()) {
-      const { quantity: currentQuantity } = docSnap.data()
-      await setDoc(docRef, { quantity: currentQuantity + quantity })
+      const { quantity: currentQuantity, price: currentPrice } = docSnap.data()
+      await setDoc(docRef, { quantity: currentQuantity + quantity, price: currentPrice })
       setSnackbarMessage(`Increased quantity of ${standardizedItem} by ${quantity}`)
       setSnackbarSeverity('success')
     } else {
-      await setDoc(docRef, { quantity })
-      setSnackbarMessage(`Added new item: ${standardizedItem} with quantity ${quantity}`)
+      await setDoc(docRef, { quantity, price })
+      setSnackbarMessage(`Added new item: ${standardizedItem} with quantity ${quantity} and price $${price}`)
       setSnackbarSeverity('success')
     }
 
@@ -66,13 +69,13 @@ export default function Home() {
     const docSnap = await getDoc(docRef)
 
     if (docSnap.exists()) {
-      const { quantity } = docSnap.data()
+      const { quantity, price } = docSnap.data()
       if (quantity === 1) {
         await deleteDoc(docRef)
         setSnackbarMessage(`Removed item: ${item}`)
         setSnackbarSeverity('info')
       } else {
-        await setDoc(docRef, { quantity: quantity - 1 })
+        await setDoc(docRef, { quantity: quantity - 1, price })
         setSnackbarMessage(`Decreased quantity of ${item}`)
         setSnackbarSeverity('warning')
       }
@@ -118,14 +121,14 @@ export default function Home() {
         flexDirection="column"
         justifyContent="center"
         alignItems="center"
-        gap={4} // increased gap for more breathing room
-        padding={4} // around box
+        gap={4}
+        padding={4}
         bgcolor="#f5f5f5"
         sx={{
           backgroundImage: 'url(http://www.pixelstalk.net/wp-content/uploads/2016/08/Wonderful-Nature-Colorful-Scene-HD.jpg)',
-          backgroundSize: 'cover', // to cover the entire area
-          backgroundPosition: 'center', // to center the image
-          backgroundRepeat: 'no-repeat', // to avoid repetition
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
         }}
       >
         <Modal open={open} onClose={handleClose}>
@@ -165,18 +168,32 @@ export default function Home() {
                 onChange={(e) => {
                   setItemQuantity(Number(e.target.value))
                 }}
-                inputProps={{ min: 1 }} // Ensure the quantity is at least 1
+                inputProps={{ min: 1 }}
+              />
+              <TextField
+                variant="outlined"
+                fullWidth
+                label="Price ($)"
+                type="number"
+                value={itemPrice}
+                onChange={(e) => {
+                  setItemPrice(e.target.value)
+                }}
+                inputProps={{ min: 0.01, step: 0.01 }}
               />
               <Button
-                variant="outlined"
+                variant="contained"
+                color="success"
                 onClick={() => {
-                  addItem(itemName, itemQuantity)
+                  addItem(itemName, itemQuantity, parseFloat(itemPrice))
                   setItemName('')
                   setItemQuantity(1)
+                  setItemPrice('')
                   handleClose()
                 }}
+                startIcon={<AddIcon />}
               >
-                Add
+                Add to Cart
               </Button>
             </Stack>
           </Box>
@@ -184,103 +201,114 @@ export default function Home() {
 
         <Button
           variant="contained"
+          color="success"
           onClick={() => {
             handleOpen()
           }}
+          startIcon={<AddIcon />}
         >
           Add New Item
         </Button>
 
         <Box
-          border="1px solid #333"
-          bgcolor="#ffffff"
-          padding={3}
-          borderRadius={4}
-          boxShadow="0px 3px 15px rgba(0, 0, 0, 0.2)"
-          width="100%"
-          maxWidth="1200px"
-        >
+  border="1px solid #333"
+  bgcolor="#ffffff"
+  padding={3}
+  borderRadius={4}
+  boxShadow="0px 3px 15px rgba(0, 0, 0, 0.2)"
+  width="100%"
+  maxWidth="1200px" // Set a maximum width
+  maxHeight="80vh" // Maximum height for vertical growth
+  overflow="auto" // Enable scrolling if the content overflows
+  display="flex"
+  flexDirection="column" // Ensure it stacks items vertically
+>
+  <Box
+    bgcolor="#e0f7fa"
+    width="100%"
+    height="100px"
+    display="flex"
+    alignItems="center"
+    justifyContent="center"
+    borderRadius={2}
+    mb={2} // margin-bottom for spacing
+  >
+    <Typography variant="h3" color="#333" fontWeight="bold">
+      Inventory Items
+    </Typography>
+  </Box>
+
+  <Grid container spacing={2}>
+    {inventory.map(({ name, quantity, price }) => (
+      <Grid item xs={12} sm={6} md={4} key={name}>
+        <Grow in={true} timeout={500}>
           <Box
-            bgcolor="#e0f7fa"
             width="100%"
-            height="100px"
+            minHeight="200px"
             display="flex"
+            flexDirection="column"
             alignItems="center"
-            justifyContent="center"
-            borderRadius={2}
-            mb={2} // margin-bottom for spacing
+            bgcolor="#f0f0f0"
+            padding={2}
+            borderRadius={4}
+            boxShadow="0px 2px 10px rgba(0, 0, 0, 0.1)"
+            sx={{
+              transition: 'background-color 0.3s',
+              '&:hover': {
+                backgroundColor: '#e0e0e0',
+              },
+            }}
           >
-            <Typography variant="h3" color="#333" fontWeight="bold">
-              Inventory Items
+            <Typography variant="h5" color="#333" textAlign="center">
+              {name.charAt(0).toUpperCase() + name.slice(1)}
             </Typography>
+            <Typography variant="h6" color="#333" textAlign="center" mt={1}>
+              Quantity: {quantity} (${price ? price.toFixed(2) : '0.00'} each, Total: ${(price && quantity ? (price * quantity).toFixed(2) : '0.00')})
+            </Typography>
+
+            <Stack direction="row" spacing={2} mt={2}>
+              <Button
+                variant="contained"
+                color="success"
+                startIcon={<AddIcon />}
+                onClick={() => {
+                  addItem(name, 1, price || 0) // Default price is 0 if undefined
+                }}
+              >
+                Add
+              </Button>
+
+              <Button
+                variant="contained"
+                color="error"
+                startIcon={<RemoveIcon />}
+                onClick={() => {
+                  removeItem(name)
+                }}
+              >
+                Remove
+              </Button>
+            </Stack>
           </Box>
+        </Grow>
+      </Grid>
+    ))}
+  </Grid>
+</Box>
 
-          <Grid container spacing={2}>
-            {inventory.map(({ name, quantity }) => (
-              <Grid item xs={12} sm={6} md={4} key={name}>
-                <Grow in={true} timeout={500}>
-                  <Box
-                    width="100%"
-                    minHeight="200px"
-                    display="flex"
-                    flexDirection="column"
-                    alignItems="center"
-                    bgcolor="#f0f0f0"
-                    padding={2}
-                    borderRadius={4}
-                    boxShadow="0px 2px 10px rgba(0, 0, 0, 0.1)"
-                    sx={{
-                      transition: 'background-color 0.3s',
-                      '&:hover': {
-                        backgroundColor: '#e0e0e0',
-                      },
-                    }}
-                  >
-                    <Typography variant="h5" color="#333" textAlign="center">
-                      {name.charAt(0).toUpperCase() + name.slice(1)}
-                    </Typography>
-                    <Typography variant="h6" color="#333" textAlign="center" mt={1}>
-                      Quantity: {quantity}
-                    </Typography>
-
-                    <Stack direction="row" spacing={2} mt={2}>
-                      <Button
-                        variant="contained"
-                        startIcon={<AddIcon />}
-                        onClick={() => {
-                          addItem(name, 1) // Default quantity is 1
-                        }}
-                      >
-                        Add
-                      </Button>
-
-                      <Button
-                        variant="contained"
-                        color="error"
-                        startIcon={<RemoveIcon />}
-                        onClick={() => {
-                          removeItem(name)
-                        }}
-                      >
-                        Remove
-                      </Button>
-                    </Stack>
-                  </Box>
-                </Grow>
-              </Grid>
-            ))}
-          </Grid>
-        </Box>
       </Box>
 
-      {/* Snackbar */}
       <Snackbar
         open={snackbarOpen}
-        autoHideDuration={3000}
+        autoHideDuration={6000}
         onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        action={
+          <Button color="inherit" onClick={handleSnackbarClose}>
+            Close
+          </Button>
+        }
       >
-        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity}>
           {snackbarMessage}
         </Alert>
       </Snackbar>
