@@ -20,6 +20,7 @@ export default function Home() {
   const [inventory, setInventory] = useState([])
   const [open, setOpen] = useState(false)
   const [itemName, setItemName] = useState('')
+  const [itemQuantity, setItemQuantity] = useState(1) // New state for quantity
   
   // Snackbar state
   const [snackbarOpen, setSnackbarOpen] = useState(false)
@@ -40,19 +41,19 @@ export default function Home() {
     setInventory(inventoryList)
   }
 
-  const addItem = async (item) => {
+  const addItem = async (item, quantity) => {
     const standardizedItem = item.toLowerCase()
     const docRef = doc(collection(firestore, 'inventory'), standardizedItem)
     const docSnap = await getDoc(docRef)
 
     if (docSnap.exists()) {
-      const { quantity } = docSnap.data()
-      await setDoc(docRef, { quantity: quantity + 1 })
-      setSnackbarMessage(`Increased quantity of ${standardizedItem}`)
+      const { quantity: currentQuantity } = docSnap.data()
+      await setDoc(docRef, { quantity: currentQuantity + quantity })
+      setSnackbarMessage(`Increased quantity of ${standardizedItem} by ${quantity}`)
       setSnackbarSeverity('success')
     } else {
-      await setDoc(docRef, { quantity: 1 })
-      setSnackbarMessage(`Added new item: ${standardizedItem}`)
+      await setDoc(docRef, { quantity })
+      setSnackbarMessage(`Added new item: ${standardizedItem} with quantity ${quantity}`)
       setSnackbarSeverity('success')
     }
 
@@ -144,21 +145,34 @@ export default function Home() {
               transform: 'translate(-50%, -50%)',
             }}
           >
-            <Typography variant="h6" textAlign="center" >Add Item</Typography>
-            <Stack width="100%" direction="row" spacing={3}>
+            <Typography variant="h6" textAlign="center">Add Item</Typography>
+            <Stack width="100%" spacing={2}>
               <TextField
                 variant="outlined"
                 fullWidth
+                label="Item Name"
                 value={itemName}
                 onChange={(e) => {
                   setItemName(e.target.value)
                 }}
               />
+              <TextField
+                variant="outlined"
+                fullWidth
+                label="Quantity"
+                type="number"
+                value={itemQuantity}
+                onChange={(e) => {
+                  setItemQuantity(Number(e.target.value))
+                }}
+                inputProps={{ min: 1 }} // Ensure the quantity is at least 1
+              />
               <Button
                 variant="outlined"
                 onClick={() => {
-                  addItem(itemName)
+                  addItem(itemName, itemQuantity)
                   setItemName('')
+                  setItemQuantity(1)
                   handleClose()
                 }}
               >
@@ -234,7 +248,7 @@ export default function Home() {
                         variant="contained"
                         startIcon={<AddIcon />}
                         onClick={() => {
-                          addItem(name)
+                          addItem(name, 1) // Default quantity is 1
                         }}
                       >
                         Add
